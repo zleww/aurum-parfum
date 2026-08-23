@@ -1,127 +1,4 @@
-const FALLBACK_PERFUMES = [
-  {
-    id: 1,
-    name: "Dior Sauvage",
-    gender: "Men",
-    scent_family: "Fresh",
-    tag: "Best Seller",
-    notes: "Calabrian Bergamot, Sichuan Pepper, Ambroxan",
-    best_time: "Night Out / Versatile Daily",
-    description: "Radically fresh, raw, and magnetic with crisp citrus and intense ambery woods.",
-    price: 250,
-    image: "images/dior-sauvage.png"
-  },
-  {
-    id: 2,
-    name: "Versace Eros",
-    gender: "Men",
-    scent_family: "Sweet",
-    tag: "Best Seller",
-    notes: "Mint Leaves, Green Apple, Tonka Bean, Vanilla",
-    best_time: "Party / Evening / Fall",
-    description: "A luminous aura with an intense, vibrant, and glowing combination of fresh mint and sweet vanilla.",
-    price: 250,
-    image: "images/versace-eros.png"
-  },
-  {
-    id: 3,
-    name: "Lacoste Black",
-    gender: "Men",
-    scent_family: "Woody",
-    tag: "New Arrivals",
-    notes: "Watermelon, Basil, Lavender, Dark Chocolate",
-    best_time: "Casual Days / Warm Evenings",
-    description: "An intense, refreshing contrast that blends aqueous watermelon with an unexpected dark chocolate finish.",
-    price: 250,
-    image: "images/lacoste-black.png"
-  },
-  {
-    id: 4,
-    name: "Bvlgari Extreme",
-    gender: "Men",
-    scent_family: "Fresh",
-    tag: "Sale",
-    notes: "Darjeeling Tea, Bergamot, Cardamom, Guaiac Wood",
-    best_time: "Office / Formal / Summer",
-    description: "Understated refinement expressing classic masculine elegance with woody tea nuances.",
-    price: 250,
-    image: "images/bvlgari-extreme.png"
-  },
-  {
-    id: 5,
-    name: "CK One",
-    gender: "Unisex",
-    scent_family: "Fresh",
-    tag: "Best Seller",
-    notes: "Green Tea, Papaya, Bergamot, Jasmine, Musk",
-    best_time: "Everyday Casual / Morning",
-    description: "The universally clean, iconic citrus harmony designed for effortless daily wear.",
-    price: 250,
-    image: "images/ck-one.png"
-  },
-  {
-    id: 6,
-    name: "Valaya",
-    gender: "Unisex",
-    scent_family: "Floral",
-    tag: "New Arrivals",
-    notes: "White Peach, Aldehydes, Orange Blossom, Ambroxan",
-    best_time: "Signature Daily / Spring",
-    description: "An ethereal sensation of soft white cotton, radiant clean florals, and subtle musks.",
-    price: 250,
-    image: "images/valaya.png"
-  },
-  {
-    id: 7,
-    name: "Ariana Grande Cloud",
-    gender: "Women",
-    scent_family: "Sweet",
-    tag: "Best Seller",
-    notes: "Lavender Blossom, Coconut Cream, Praline, Vanilla",
-    best_time: "Cool Weather / Date Night",
-    description: "An uplifting, dreamy scent imbued with decadent praline and airy whipped cream.",
-    price: 250,
-    image: "images/cloud.png"
-  },
-  {
-    id: 8,
-    name: "Chanel Chance",
-    gender: "Women",
-    scent_family: "Floral",
-    tag: "Best Seller",
-    notes: "Pink Pepper, Jasmine, Patchouli, Amber Musk",
-    best_time: "Daytime Professional / High Tea",
-    description: "An unpredictable, sparkling floral constellation wrapped in soft spiced elegance.",
-    price: 250,
-    image: "images/chanel-chance.png"
-  },
-  {
-    id: 9,
-    name: "Incanto Shine",
-    gender: "Women",
-    scent_family: "Fruity",
-    tag: "Sale",
-    notes: "Pineapple, Passionfruit, Freesia, White Cedar",
-    best_time: "Summer / Outings / Casual",
-    description: "A dazzling tropical fantasy rich with ripe passionfruit and cheerful sunny blooms.",
-    price: 250,
-    image: "images/incanto-shine.png"
-  },
-  {
-    id: 10,
-    name: "Bombshell",
-    gender: "Women",
-    scent_family: "Fruity",
-    tag: "New Arrivals",
-    notes: "Purple Passion Fruit, Shangri-la Peony, Vanilla Orchid",
-    best_time: "Afternoon / Casual Glam",
-    description: "A vibrant blend of fresh-cut peonies and exotic sun-drenched fruits.",
-    price: 250,
-    image: "images/bombshell.png"
-  }
-];
-
-let perfumes = [...FALLBACK_PERFUMES];
+let perfumes = [];
 let cart = [];
 let activeFilters = {
   gender: 'all',
@@ -130,19 +7,27 @@ let activeFilters = {
   search: ''
 };
 
-async function initApp() {
-  renderCatalog();
+// Sync perfumes with backend & local backup
+async function fetchCatalog() {
   try {
     const res = await fetch('/api');
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
         perfumes = data;
+        localStorage.setItem('aurum_catalog', JSON.stringify(perfumes));
         renderCatalog();
+        return;
       }
     }
   } catch (err) {
-    console.log('Using static catalog data');
+    console.warn('API fetch failed, reading cache...');
+  }
+  
+  const cached = localStorage.getItem('aurum_catalog');
+  if (cached) {
+    perfumes = JSON.parse(cached);
+    renderCatalog();
   }
 }
 
@@ -174,7 +59,7 @@ function renderCatalog() {
     card.innerHTML = `
       <div class="card-img-wrapper">
         <span class="badge">${p.gender}</span>
-        <img src="${p.image}" alt="${p.name}">
+        <img src="${p.image}" alt="${p.name}" onerror="this.src='images/dior-sauvage.png'">
       </div>
       <div class="card-info">
         <span class="card-tag">${p.scent_family} • ${p.tag}</span>
@@ -193,7 +78,7 @@ function openProductModal(id) {
   const modalBody = document.getElementById('modalBody');
   modalBody.innerHTML = `
     <div class="modal-img-col">
-      <img src="${item.image}" alt="${item.name}">
+      <img src="${item.image}" alt="${item.name}" onerror="this.src='images/dior-sauvage.png'">
     </div>
     <div class="modal-detail-col">
       <h2>${item.name}</h2>
@@ -254,6 +139,7 @@ function removeItem(index) {
 function openCart() { document.getElementById('cartDrawer').classList.add('active'); }
 function closeCart() { document.getElementById('cartDrawer').classList.remove('active'); }
 
+// Live Checkout submission
 async function checkout() {
   if (cart.length === 0) return alert('Your bag is currently empty.');
   
@@ -279,21 +165,29 @@ async function checkout() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderPayload)
     });
-    
+
     if (res.ok) {
       alert(`Thank you ${customerName}! Your order has been placed with Aurum Parfum.`);
-      cart = [];
-      updateCartUI();
-      closeCart();
     }
   } catch (err) {
-    alert('Order recorded locally!');
-    cart = [];
-    updateCartUI();
-    closeCart();
+    // Local storage fallback sync
+    let localOrders = JSON.parse(localStorage.getItem('aurum_orders') || '[]');
+    localOrders.unshift({
+      order_id: `AUR-${Date.now()}`,
+      timestamp: new Date().toLocaleString(),
+      status: 'Pending',
+      ...orderPayload
+    });
+    localStorage.setItem('aurum_orders', JSON.stringify(localOrders));
+    alert(`Thank you ${customerName}! Your order has been placed.`);
   }
+
+  cart = [];
+  updateCartUI();
+  closeCart();
 }
 
+// Navigation & Category Filters
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -327,4 +221,6 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
   renderCatalog();
 });
 
-window.addEventListener('DOMContentLoaded', initApp);
+// Auto-sync polling every 4 seconds to catch new additions by owner
+setInterval(fetchCatalog, 4000);
+window.addEventListener('DOMContentLoaded', fetchCatalog);

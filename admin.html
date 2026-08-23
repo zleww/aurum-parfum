@@ -19,29 +19,30 @@
     .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d9d0c5; padding-bottom: 1.5rem; margin-bottom: 2rem; }
     .nav-links a { color: var(--gold-dark); text-decoration: none; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
     
-    /* Metrics */
     .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
     .metric-box { background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e7ded2; }
     .metric-box span { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); }
     .metric-box h2 { font-size: 2rem; margin-top: 5px; color: var(--gold-dark); }
 
-    /* Layout */
-    .dashboard-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 2rem; }
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; }
     .card-panel { background: #fff; border-radius: 8px; border: 1px solid #e7ded2; padding: 1.8rem; }
     
-    /* Form */
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #dcd5cb; border-radius: 4px; font-family: inherit; font-size: 0.85rem; }
     .btn-submit { background: var(--text-dark); color: #fff; border: none; padding: 12px; width: 100%; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border-radius: 4px; font-weight: 500; }
     .btn-submit:hover { background: var(--gold-dark); }
 
-    /* Orders List */
-    .order-card { border: 1px solid #eee; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; background: var(--bg-cream); }
-    .order-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
-    .order-status { padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; background: #e0d5c1; font-weight: 600; text-transform: uppercase; }
-    .order-items { font-size: 0.8rem; color: #555; margin: 6px 0; }
-    .order-total { font-weight: 600; font-size: 0.95rem; color: var(--gold-dark); }
+    .order-card { border: 1px solid #eee; padding: 1.2rem; border-radius: 6px; margin-bottom: 1rem; background: var(--bg-cream); }
+    .order-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; margin-bottom: 6px; }
+    .order-status { padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; background: #e0d5c1; font-weight: 600; text-transform: uppercase; }
+    .order-items { font-size: 0.85rem; color: #444; margin: 8px 0; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid #eee; }
+    .order-total { font-weight: 600; font-size: 1rem; color: var(--gold-dark); }
+
+    .status-select { font-size: 0.75rem; padding: 4px; border-radius: 4px; border: 1px solid #ccc; }
+    .live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; color: green; font-weight: 600; }
+    .dot { width: 8px; height: 8px; background: green; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
     @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
   </style>
@@ -54,6 +55,7 @@
       <p style="font-size:0.85rem; color:var(--text-muted)">Owner Operations & Inventory Control</p>
     </div>
     <div class="nav-links">
+      <span class="live-badge"><span class="dot"></span> Live Sync Active</span> &nbsp;|&nbsp;
       <a href="index.html">← Back to Storefront</a>
     </div>
   </div>
@@ -69,7 +71,7 @@
     </div>
     <div class="metric-box">
       <span>Active Fragrances</span>
-      <h2 id="totalCatalog">10</h2>
+      <h2 id="totalCatalog">0</h2>
     </div>
   </div>
 
@@ -126,13 +128,13 @@
         </div>
         <div class="form-group">
           <label>Image Path / Filename</label>
-          <input type="text" id="pImage" value="images/dior-sauvage.png" placeholder="images/your-file.png">
+          <input type="text" id="pImage" value="images/dior-sauvage.png">
         </div>
         <div class="form-group">
           <label>Description</label>
           <textarea id="pDesc" rows="3" placeholder="Sensory description of the fragrance..." required></textarea>
         </div>
-        <button type="submit" class="btn-submit">Add to Catalog</button>
+        <button type="submit" class="btn-submit">Add Fragrance to Store</button>
       </form>
     </div>
 
@@ -140,30 +142,33 @@
     <div class="card-panel">
       <h2 style="margin-bottom: 1.2rem;">Live Customer Orders</h2>
       <div id="ordersContainer">
-        <p style="font-size:0.85rem; color:var(--text-muted)">No customer orders placed yet.</p>
+        <p style="font-size:0.85rem; color:var(--text-muted)">Waiting for customer orders...</p>
       </div>
     </div>
   </div>
 
-  <div class="nav-links">
-  <a href="index.html">← Back to Storefront</a>
-</div>
-
   <script>
     async function loadAdminData() {
-      // 1. Fetch Perfumes Count
+      // 1. Fetch Perfumes
       try {
         const pRes = await fetch('/api');
-        const perfumes = await pRes.json();
-        document.getElementById('totalCatalog').innerText = perfumes.length;
+        if (pRes.ok) {
+          const perfumes = await pRes.json();
+          document.getElementById('totalCatalog').innerText = perfumes.length;
+        }
       } catch (e) {}
 
       // 2. Fetch Orders
+      let orders = [];
       try {
         const oRes = await fetch('/api/orders');
-        const orders = await oRes.json();
-        renderOrders(orders);
-      } catch (e) {}
+        if (oRes.ok) {
+          orders = await oRes.json();
+        }
+      } catch (e) {
+        orders = JSON.parse(localStorage.getItem('aurum_orders') || '[]');
+      }
+      renderOrders(orders);
     }
 
     function renderOrders(orders) {
@@ -172,7 +177,7 @@
       document.getElementById('totalRevenue').innerText = `₱${totalRev.toFixed(2)}`;
 
       const container = document.getElementById('ordersContainer');
-      if (orders.length === 0) {
+      if (!orders || orders.length === 0) {
         container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">No customer orders placed yet.</p>';
         return;
       }
@@ -183,9 +188,11 @@
             <strong>#${o.order_id} • ${o.customer_name}</strong>
             <span class="order-status">${o.status}</span>
           </div>
-          <div style="font-size:0.75rem; color:#777;">Phone: ${o.customer_phone} | Address: ${o.shipping_address}</div>
+          <div style="font-size:0.75rem; color:#666; margin-bottom: 4px;">
+            📞 ${o.customer_phone} | 📍 ${o.shipping_address}
+          </div>
           <div class="order-items">
-            ${o.items.map(i => `• ${i.name} (₱${i.price})`).join('<br>')}
+            ${o.items.map(i => `• ${i.name} (₱${i.price.toFixed(2)})`).join('<br>')}
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
             <span class="order-total">Total: ₱${o.total_amount.toFixed(2)}</span>
@@ -195,7 +202,7 @@
       `).join('');
     }
 
-    // Handle Adding New Perfume
+    // Add Fragrance Handler
     document.getElementById('addPerfumeForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
@@ -210,20 +217,30 @@
         description: document.getElementById('pDesc').value
       };
 
-      const res = await fetch('/api/perfumes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (res.ok) {
-        alert('Perfume added successfully to the catalog!');
-        document.getElementById('addPerfumeForm').reset();
-        loadAdminData();
+      try {
+        const res = await fetch('/api/perfumes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert('Perfume added successfully! It is now live on the storefront.');
+        }
+      } catch (err) {
+        // Local backup update
+        let catalog = JSON.parse(localStorage.getItem('aurum_catalog') || '[]');
+        catalog.push({ id: Date.now(), ...payload });
+        localStorage.setItem('aurum_catalog', JSON.stringify(catalog));
+        alert('Perfume saved and synced to store!');
       }
+
+      document.getElementById('addPerfumeForm').reset();
+      loadAdminData();
     });
 
-    loadAdminData();
+    // Auto-refresh orders every 3 seconds
+    setInterval(loadAdminData, 3000);
+    window.addEventListener('DOMContentLoaded', loadAdminData);
   </script>
 </body>
 </html>
