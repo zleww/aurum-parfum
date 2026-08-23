@@ -624,14 +624,7 @@ perfumes = [
 
 @app.get("/")
 def root():
-    return {
-        "brand": "AURUM PARFUM",
-        "tagline": "Wear Confidence",
-        "bottle_size": "60ml / 1.7 fl. oz. Eau De Parfum",
-        "pricing": "₱250 each | Buy 2 for ₱450 (Save ₱50)",
-        "total_fragrances": len(perfumes),
-        "docs": "/docs"
-    }
+    return {"message": "Aurum Parfum API running", "docs": "/docs"}
 
 @app.get("/perfumes")
 def get_perfumes(

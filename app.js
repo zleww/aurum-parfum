@@ -82,13 +82,15 @@ function displayPerfumes(list) {
     return;
   }
 
+  const defaultImg = "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=600";
+
   list.forEach(p => {
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
       <div class="card-media">
         <span class="card-badge">${p.tag}</span>
-        <img src="${p.image}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?auto=format&fit=crop&q=80&w=600'" />
+        <img src="${p.image || defaultImg}" alt="${p.name}" onerror="this.onerror=null;this.src='${defaultImg}';" />
       </div>
       <div class="card-body">
         <div class="card-meta">
