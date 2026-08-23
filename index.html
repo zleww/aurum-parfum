@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AURUM PARFUM | Wear Confidence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Top Announcement Bar -->
+  <div class="promo-bar">
+    <span>✨ SPECIAL OFFER: ₱250 EACH · BUY ANY 2 BOTTLES FOR ONLY <strong>₱450</strong> (SAVE ₱50) ✨</span>
+  </div>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-left">
+      <button class="nav-link" onclick="filterByGender('Women')">Women</button>
+      <button class="nav-link" onclick="filterByGender('Men')">Men</button>
+      <button class="nav-link" onclick="filterByGender('Unisex')">Unisex</button>
+    </div>
+    
+    <div class="brand-logo" onclick="loadAllPerfumes()">
+      <h1>AURUM</h1>
+      <span>PARFUM</span>
+    </div>
+
+    <div class="nav-right">
+      <button class="nav-link" onclick="filterByTag('New Arrival')">New</button>
+      <button class="nav-link" onclick="filterByTag('Best Seller')">Best Sellers</button>
+      <button class="nav-link" onclick="filterByTag('Sale')">Sale</button>
+      <button class="btn-quiz-nav" onclick="openQuiz()">Scent Quiz</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-container">
+    <div class="hero-overlay"></div>
+    <div class="hero-card">
+      <span class="hero-badge">EAU DE PARFUM · 60ML</span>
+      <h2>Where Scent Becomes Emotion</h2>
+      <p>Masterfully crafted fragrances inspired by the world's most iconic luxury houses.</p>
+      <div class="hero-actions">
+        <button class="btn-gold-fill" onclick="document.getElementById('catalogSection').scrollIntoView({behavior: 'smooth'})">Explore Scents</button>
+        <button class="btn-gold-outline" onclick="openQuiz()">Find Your Match</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Scent Filter Controls -->
+  <section id="catalogSection" class="filter-section">
+    <div class="search-bar-wrap">
+      <input type="text" id="searchInput" placeholder="Search by name, code (M47, W06), or notes (e.g. Vanilla, Bergamot, Rose)..." onkeydown="if(event.key==='Enter') searchPerfumes()" />
+      <button class="btn-gold-fill" onclick="searchPerfumes()">Search</button>
+      <button class="btn-reset" onclick="loadAllPerfumes()">Reset</button>
+    </div>
+
+    <!-- Fragrance Families -->
+    <div class="scent-families">
+      <button class="pill active" onclick="filterByCategory('all', this)">All Notes</button>
+      <button class="pill" onclick="filterByCategory('Woody', this)">🪵 Woody</button>
+      <button class="pill" onclick="filterByCategory('Floral', this)">🌸 Floral</button>
+      <button class="pill" onclick="filterByCategory('Fresh', this)">🌊 Fresh & Citrus</button>
+      <button class="pill" onclick="filterByCategory('Sweet', this)">🍰 Sweet & Gourmand</button>
+    </div>
+  </section>
+
+  <!-- Main Product Grid -->
+  <main class="main-wrapper">
+    <div class="section-title">
+      <h3 id="currentCategoryTitle">Curated Fragrance Collection</h3>
+      <div class="gold-line"></div>
+    </div>
+
+    <div id="perfumeGrid" class="perfume-grid">
+      <!-- Injected via app.js -->
+    </div>
+  </main>
+
+  <!-- Product Detail Modal -->
+  <div id="detailModal" class="modal-backdrop hidden" onclick="closeModal(event)">
+    <div class="modal-window" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <div id="modalContent" class="modal-grid">
+        <!-- Injected via app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scent Quiz Modal -->
+  <div id="quizModal" class="modal-backdrop hidden" onclick="closeQuiz(event)">
+    <div class="modal-window quiz-window" onclick="event.stopPropagation()">
+      <button class="close-btn" onclick="closeQuiz()">&times;</button>
+      <h3>Find Your Signature Aurum Scent</h3>
+      <p class="quiz-sub">Select your fragrance mood and time of wear:</p>
+      
+      <div class="quiz-field">
+        <label>What scent family draws you most?</label>
+        <select id="quizScent">
+          <option value="Woody">Rich woods, smokiness, & warm spices</option>
+          <option value="Floral">Velvety rose, blooming jasmine, & soft petals</option>
+          <option value="Fresh">Crisp citrus, sea salt, & refreshing green air</option>
+          <option value="Sweet">Decadent vanilla, praline, & creamy gourmand</option>
+        </select>
+      </div>
+
+      <div class="quiz-field">
+        <label>What is the primary occasion?</label>
+        <select id="quizOccasion">
+          <option value="Evening">Evening dates & special occasions</option>
+          <option value="Everyday">Daily signature & office wear</option>
+        </select>
+      </div>
+
+      <button class="btn-gold-fill full-width" onclick="submitQuiz()">Show My Matches</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>© 2026 AURUM PARFUM · WEAR CONFIDENCE · EAU DE PARFUM 60ML</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
