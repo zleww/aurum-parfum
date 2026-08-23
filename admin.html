@@ -24,19 +24,19 @@
     .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 2rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2.5rem; }
     .top-bar h1 { font-size: 2.2rem; font-weight: 600; }
     .top-actions { display: flex; align-items: center; gap: 1.5rem; }
-    .btn-return { color: var(--text-dark); text-decoration: none; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid var(--text-dark); padding: 8px 16px; border-radius: 20px; }
+    .btn-return { color: var(--text-dark); text-decoration: none; font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; border: 1px solid var(--text-dark); padding: 8px 16px; border-radius: 20px; transition: all 0.2s; }
     .btn-return:hover { background: var(--text-dark); color: #fff; }
     .live-indicator { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--success); font-weight: 600; text-transform: uppercase; }
     .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
     .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2.5rem; }
-    .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.6rem; border-radius: 10px; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 1.6rem; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
     .stat-card span { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 500; }
     .stat-card h2 { font-size: 2.2rem; margin-top: 6px; color: var(--gold-dark); font-weight: 600; }
 
     .main-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 2.5rem; }
-    .panel { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 2rem; }
+    .panel { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 2rem; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
     .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
     .panel-header h2 { font-size: 1.6rem; }
 
@@ -44,7 +44,7 @@
     .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 5px; }
     .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); background: var(--bg-cream); border-radius: 6px; font-family: inherit; font-size: 0.85rem; color: var(--text-dark); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .btn-luxury-submit { background: var(--text-dark); color: #fff; border: none; padding: 14px; width: 100%; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border-radius: 6px; font-size: 0.8rem; font-weight: 600; margin-top: 0.5rem; }
+    .btn-luxury-submit { background: var(--text-dark); color: #fff; border: none; padding: 14px; width: 100%; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border-radius: 6px; font-size: 0.8rem; font-weight: 600; margin-top: 0.5rem; transition: background 0.2s; }
     .btn-luxury-submit:hover { background: var(--gold-dark); }
 
     .inventory-table { width: 100%; border-collapse: collapse; }
@@ -102,7 +102,7 @@
 
   <div class="main-grid">
 
-    <!-- Add Fragrance Form -->
+    <!-- Add Fragrance Panel -->
     <div class="panel">
       <div class="panel-header">
         <h2>Add Fragrance</h2>
@@ -110,7 +110,7 @@
       <form id="addPerfumeForm">
         <div class="form-group">
           <label>Fragrance Name</label>
-          <input type="text" id="pName" placeholder="e.g. Baccarat Rouge" required>
+          <input type="text" id="pName" placeholder="e.g. Baccarat Rouge 540" required>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -152,11 +152,11 @@
         </div>
         <div class="form-group">
           <label>Fragrance Notes</label>
-          <input type="text" id="pNotes" placeholder="e.g. Saffron, Jasmine, Amberwood" required>
+          <input type="text" id="pNotes" placeholder="e.g. Saffron, Jasmine, Amberwood, Cedar" required>
         </div>
         <div class="form-group">
           <label>Best Time to Wear</label>
-          <input type="text" id="pTime" placeholder="e.g. Evening / Formal Gatherings" required>
+          <input type="text" id="pTime" placeholder="e.g. Evening / Formal Occasions" required>
         </div>
         <div class="form-group">
           <label>Image Filename</label>
@@ -164,13 +164,13 @@
         </div>
         <div class="form-group">
           <label>Description</label>
-          <textarea id="pDesc" rows="3" placeholder="Sensory notes and impression..." required></textarea>
+          <textarea id="pDesc" rows="3" placeholder="Luminous and sophisticated aroma..." required></textarea>
         </div>
         <button type="submit" class="btn-luxury-submit">+ Add Fragrance to Store</button>
       </form>
     </div>
 
-    <!-- Inventory Stock & Orders Columns -->
+    <!-- Management Panels -->
     <div style="display: flex; flex-direction: column; gap: 2rem;">
       
       <!-- Inventory Table -->
@@ -196,7 +196,7 @@
         </div>
       </div>
 
-      <!-- Orders View -->
+      <!-- Orders Feed -->
       <div class="panel">
         <div class="panel-header">
           <h2>Customer Orders</h2>
@@ -212,16 +212,16 @@
 
   <script>
     const CORE_DEFAULTS = [
-      { id: 1, name: "Dior Sauvage", gender: "Men", scent_family: "Fresh", tag: "Best Seller", notes: "Calabrian Bergamot, Sichuan Pepper, Ambroxan", best_time: "Night Out / Versatile Daily", description: "Radically fresh, raw, and magnetic.", price: 250, stock: 30, image: "images/dior-sauvage.png" },
-      { id: 2, name: "Versace Eros", gender: "Men", scent_family: "Sweet", tag: "Best Seller", notes: "Mint Leaves, Green Apple, Tonka Bean, Vanilla", best_time: "Party / Evening / Fall", description: "Luminous and vibrant sweet woods.", price: 250, stock: 25, image: "images/versace-eros.png" },
-      { id: 3, name: "Lacoste Black", gender: "Men", scent_family: "Woody", tag: "New Arrivals", notes: "Watermelon, Basil, Lavender, Dark Chocolate", best_time: "Casual Days / Warm Evenings", description: "Crisp watermelon and dark chocolate.", price: 250, stock: 20, image: "images/lacoste-black.png" },
-      { id: 4, name: "Bvlgari Extreme", gender: "Men", scent_family: "Fresh", tag: "Sale", notes: "Darjeeling Tea, Bergamot, Cardamom, Guaiac Wood", best_time: "Office / Formal / Summer", description: "Classic masculine elegance and tea notes.", price: 250, stock: 15, image: "images/bvlgari-extreme.png" },
-      { id: 5, name: "CK One", gender: "Unisex", scent_family: "Fresh", tag: "Best Seller", notes: "Green Tea, Papaya, Bergamot, Jasmine, Musk", best_time: "Everyday Casual / Morning", description: "Clean, universally beloved citrus harmony.", price: 250, stock: 40, image: "images/ck-one.png" },
-      { id: 6, name: "Valaya", gender: "Unisex", scent_family: "Floral", tag: "New Arrivals", notes: "White Peach, Aldehydes, Orange Blossom, Ambroxan", best_time: "Signature Daily / Spring", description: "Ethereal sensation of white cotton and clean florals.", price: 250, stock: 18, image: "images/valaya.png" },
-      { id: 7, name: "Ariana Grande Cloud", gender: "Women", scent_family: "Sweet", tag: "Best Seller", notes: "Lavender Blossom, Coconut Cream, Praline, Vanilla", best_time: "Cool Weather / Date Night", description: "Dreamy whipped cream and sweet praline.", price: 250, stock: 35, image: "images/cloud.png" },
-      { id: 8, name: "Chanel Chance", gender: "Women", scent_family: "Floral", tag: "Best Seller", notes: "Pink Pepper, Jasmine, Patchouli, Amber Musk", best_time: "Daytime Professional / High Tea", description: "Sparkling chic floral constellation.", price: 250, stock: 22, image: "images/chanel-chance.png" },
-      { id: 9, name: "Incanto Shine", gender: "Women", scent_family: "Fruity", tag: "Sale", notes: "Pineapple, Passionfruit, Freesia, White Cedar", best_time: "Summer / Outings / Casual", description: "Juicy tropical fantasy with radiant petals.", price: 250, stock: 12, image: "images/incanto-shine.png" },
-      { id: 10, name: "Bombshell", gender: "Women", scent_family: "Fruity", tag: "New Arrivals", notes: "Purple Passion Fruit, Shangri-la Peony, Vanilla Orchid", best_time: "Afternoon / Casual Glam", description: "Bold, glamorous fruity floral.", price: 250, stock: 28, image: "images/bombshell.png" }
+      { id: 1, name: "Dior Sauvage", gender: "Men", scent_family: "Fresh", tag: "Best Seller", notes: "Calabrian Bergamot, Sichuan Pepper, Ambroxan", best_time: "Night Out / Versatile Daily", description: "Radically fresh, raw, and magnetic with crisp citrus and intense ambery woods.", price: 250, stock: 30, image: "images/dior-sauvage.png" },
+      { id: 2, name: "Versace Eros", gender: "Men", scent_family: "Sweet", tag: "Best Seller", notes: "Mint Leaves, Green Apple, Tonka Bean, Vanilla", best_time: "Party / Evening / Fall", description: "A luminous aura with an intense, vibrant, and glowing combination of fresh mint and sweet vanilla.", price: 250, stock: 25, image: "images/versace-eros.png" },
+      { id: 3, name: "Lacoste Black", gender: "Men", scent_family: "Woody", tag: "New Arrivals", notes: "Watermelon, Basil, Lavender, Dark Chocolate", best_time: "Casual Days / Warm Evenings", description: "An intense, refreshing contrast that blends aqueous watermelon with an unexpected dark chocolate finish.", price: 250, stock: 20, image: "images/lacoste-black.png" },
+      { id: 4, name: "Bvlgari Extreme", gender: "Men", scent_family: "Fresh", tag: "Sale", notes: "Darjeeling Tea, Bergamot, Cardamom, Guaiac Wood", best_time: "Office / Formal / Summer", description: "Understated refinement expressing classic masculine elegance with woody tea nuances.", price: 250, stock: 15, image: "images/bvlgari-extreme.png" },
+      { id: 5, name: "CK One", gender: "Unisex", scent_family: "Fresh", tag: "Best Seller", notes: "Green Tea, Papaya, Bergamot, Jasmine, Musk", best_time: "Everyday Casual / Morning", description: "The universally clean, iconic citrus harmony designed for effortless daily wear.", price: 250, stock: 40, image: "images/ck-one.png" },
+      { id: 6, name: "Valaya", gender: "Unisex", scent_family: "Floral", tag: "New Arrivals", notes: "White Peach, Aldehydes, Orange Blossom, Ambroxan", best_time: "Signature Daily / Spring", description: "An ethereal sensation of soft white cotton, radiant clean florals, and subtle musks.", price: 250, stock: 18, image: "images/valaya.png" },
+      { id: 7, name: "Ariana Grande Cloud", gender: "Women", scent_family: "Sweet", tag: "Best Seller", notes: "Lavender Blossom, Coconut Cream, Praline, Vanilla", best_time: "Cool Weather / Date Night", description: "An uplifting, dreamy scent imbued with decadent praline and airy whipped cream.", price: 250, stock: 35, image: "images/cloud.png" },
+      { id: 8, name: "Chanel Chance", gender: "Women", scent_family: "Floral", tag: "Best Seller", notes: "Pink Pepper, Jasmine, Patchouli, Amber Musk", best_time: "Daytime Professional / High Tea", description: "An unpredictable, sparkling floral constellation wrapped in soft spiced elegance.", price: 250, stock: 22, image: "images/chanel-chance.png" },
+      { id: 9, name: "Incanto Shine", gender: "Women", scent_family: "Fruity", tag: "Sale", notes: "Pineapple, Passionfruit, Freesia, White Cedar", best_time: "Summer / Outings / Casual", description: "A dazzling tropical fantasy rich with ripe passionfruit and cheerful sunny blooms.", price: 250, stock: 12, image: "images/incanto-shine.png" },
+      { id: 10, name: "Bombshell", gender: "Women", scent_family: "Fruity", tag: "New Arrivals", notes: "Purple Passion Fruit, Shangri-la Peony, Vanilla Orchid", best_time: "Afternoon / Casual Glam", description: "A vibrant blend of fresh-cut peonies and exotic sun-drenched fruits.", price: 250, stock: 28, image: "images/bombshell.png" }
     ];
 
     function getCatalog() {
@@ -291,7 +291,6 @@
       }
     }
 
-    // Dynamic stock adder prompt
     function promptAddStock(id, name) {
       const input = prompt(`How many units would you like to add to "${name}" stock?`, "10");
       if (input !== null) {
