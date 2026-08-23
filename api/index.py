@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List, Optional
+import time
 
 app = FastAPI()
 
@@ -11,6 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Initial Perfume Catalog
 PERFUMES = [
     {
         "id": 1,
@@ -134,13 +138,71 @@ PERFUMES = [
     }
 ]
 
+ORDERS = []
+
+# Data Models
+class PerfumeCreate(BaseModel):
+    name: str
+    gender: str
+    scent_family: str
+    tag: str
+    notes: str
+    best_time: str
+    description: str
+    price: float
+    image: Optional[str] = "images/dior-sauvage.png"
+
+class OrderItem(BaseModel):
+    id: int
+    name: str
+    price: float
+
+class OrderCreate(BaseModel):
+    customer_name: str
+    customer_phone: str
+    shipping_address: str
+    payment_method: str
+    items: List[OrderItem]
+    total_amount: float
+
+# --- Routes ---
+
 @app.get("/api")
 def get_perfumes():
     return PERFUMES
 
-@app.get("/api/perfumes/{perfume_id}")
-def get_perfume(perfume_id: int):
-    for p in PERFUMES:
-        if p["id"] == perfume_id:
-            return p
-    return {"error": "Perfume not found"}
+@app.post("/api/perfumes")
+def add_perfume(perfume: PerfumeCreate):
+    new_id = max([p["id"] for p in PERFUMES], default=0) + 1
+    new_entry = {"id": new_id, **perfume.dict()}
+    PERFUMES.append(new_entry)
+    return {"message": "Perfume created successfully", "perfume": new_entry}
+
+@app.delete("/api/perfumes/{perfume_id}")
+def delete_perfume(perfume_id: int):
+    global PERFUMES
+    PERFUMES = [p for p in PERFUMES if p["id"] != perfume_id]
+    return {"message": "Perfume deleted"}
+
+@app.get("/api/orders")
+def get_orders():
+    return ORDERS
+
+@app.post("/api/orders")
+def create_order(order: OrderCreate):
+    order_data = {
+        "order_id": f"AUR-{int(time.time())}",
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "status": "Pending",
+        **order.dict()
+    }
+    ORDERS.insert(0, order_data)
+    return {"message": "Order placed successfully", "order": order_data}
+
+@app.patch("/api/orders/{order_id}/status")
+def update_order_status(order_id: str, status: dict):
+    for o in ORDERS:
+        if o["order_id"] == order_id:
+            o["status"] = status.get("status", o["status"])
+            return {"message": "Order updated", "order": o}
+    raise HTTPException(status_code=404, detail="Order not found")

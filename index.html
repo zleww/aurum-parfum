@@ -3,91 +3,223 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aurum Parfum | Luxury Scents</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title>Aurum Parfum | Owner Operations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #fbf9f5;
+      --card-bg: #f4eee5;
+      --gold-dark: #a8843c;
+      --text-dark: #1f1d1a;
+      --text-muted: #736b63;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--bg-cream); color: var(--text-dark); padding: 2rem; }
+    h1, h2, h3 { font-family: 'Cormorant Garamond', serif; }
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d9d0c5; padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    .nav-links a { color: var(--gold-dark); text-decoration: none; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; }
+    
+    /* Metrics */
+    .metrics-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+    .metric-box { background: #fff; padding: 1.5rem; border-radius: 8px; border: 1px solid #e7ded2; }
+    .metric-box span { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); }
+    .metric-box h2 { font-size: 2rem; margin-top: 5px; color: var(--gold-dark); }
+
+    /* Layout */
+    .dashboard-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 2rem; }
+    .card-panel { background: #fff; border-radius: 8px; border: 1px solid #e7ded2; padding: 1.8rem; }
+    
+    /* Form */
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 12px; border: 1px solid #dcd5cb; border-radius: 4px; font-family: inherit; font-size: 0.85rem; }
+    .btn-submit { background: var(--text-dark); color: #fff; border: none; padding: 12px; width: 100%; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border-radius: 4px; font-weight: 500; }
+    .btn-submit:hover { background: var(--gold-dark); }
+
+    /* Orders List */
+    .order-card { border: 1px solid #eee; padding: 1rem; border-radius: 6px; margin-bottom: 1rem; background: var(--bg-cream); }
+    .order-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
+    .order-status { padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; background: #e0d5c1; font-weight: 600; text-transform: uppercase; }
+    .order-items { font-size: 0.8rem; color: #555; margin: 6px 0; }
+    .order-total { font-weight: 600; font-size: 0.95rem; color: var(--gold-dark); }
+
+    @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
 
-  <!-- Navigation -->
-  <header class="navbar">
+  <div class="header">
+    <div>
+      <h1>AURUM PARFUM</h1>
+      <p style="font-size:0.85rem; color:var(--text-muted)">Owner Operations & Inventory Control</p>
+    </div>
     <div class="nav-links">
-      <button class="nav-btn active" data-filter="tag" data-val="all">All Scents</button>
-      <button class="nav-btn" data-filter="gender" data-val="Women">Women</button>
-      <button class="nav-btn" data-filter="gender" data-val="Men">Men</button>
-      <button class="nav-btn" data-filter="gender" data-val="Unisex">Unisex</button>
-      <button class="nav-btn" data-filter="tag" data-val="New Arrivals">New Arrivals</button>
-      <button class="nav-btn" data-filter="tag" data-val="Best Seller">Best Sellers</button>
-      <button class="nav-btn" data-filter="tag" data-val="Sale">Sale</button>
+      <a href="index.html">← Back to Storefront</a>
     </div>
-    <div class="logo">AURUM PARFUM</div>
-    <div class="nav-actions">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search perfume or note...">
-      </div>
-      <button class="cart-btn" onclick="openCart()">Bag (<span id="cartCount">0</span>)</button>
-    </div>
-  </header>
+  </div>
 
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <h1>Where Scent Becomes Emotion</h1>
-      <p>Discover hand-crafted inspired fragrances made to capture your true individuality.</p>
-      <a href="#catalog" class="btn-hero">Explore Fragrances</a>
+  <div class="metrics-row">
+    <div class="metric-box">
+      <span>Total Revenue</span>
+      <h2 id="totalRevenue">₱0.00</h2>
     </div>
-  </section>
+    <div class="metric-box">
+      <span>Total Orders</span>
+      <h2 id="totalOrders">0</h2>
+    </div>
+    <div class="metric-box">
+      <span>Active Fragrances</span>
+      <h2 id="totalCatalog">10</h2>
+    </div>
+  </div>
 
-  <!-- Scent Family Filters -->
-  <section class="scent-families">
-    <span class="family-label">Explore Scent Notes:</span>
-    <div class="family-pills">
-      <button class="pill active" data-filter="scent_family" data-val="all">All Notes</button>
-      <button class="pill" data-filter="scent_family" data-val="Fresh">Fresh</button>
-      <button class="pill" data-filter="scent_family" data-val="Floral">Floral</button>
-      <button class="pill" data-filter="scent_family" data-val="Woody">Woody</button>
-      <button class="pill" data-filter="scent_family" data-val="Sweet">Sweet</button>
-      <button class="pill" data-filter="scent_family" data-val="Fruity">Fruity</button>
+  <div class="dashboard-grid">
+    <!-- Add New Perfume Form -->
+    <div class="card-panel">
+      <h2 style="margin-bottom: 1.2rem;">Add New Fragrance</h2>
+      <form id="addPerfumeForm">
+        <div class="form-group">
+          <label>Fragrance Name</label>
+          <input type="text" id="pName" placeholder="e.g. Amber Nuit" required>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="pGender">
+              <option value="Men">Men</option>
+              <option value="Women">Women</option>
+              <option value="Unisex">Unisex</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Scent Family</label>
+            <select id="pFamily">
+              <option value="Fresh">Fresh</option>
+              <option value="Floral">Floral</option>
+              <option value="Woody">Woody</option>
+              <option value="Sweet">Sweet</option>
+              <option value="Fruity">Fruity</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Collection Tag</label>
+            <select id="pTag">
+              <option value="New Arrivals">New Arrivals</option>
+              <option value="Best Seller">Best Seller</option>
+              <option value="Sale">Sale</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Price (₱)</label>
+            <input type="number" id="pPrice" value="250" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Fragrance Notes</label>
+          <input type="text" id="pNotes" placeholder="e.g. Bergamot, Sandalwood, Amber" required>
+        </div>
+        <div class="form-group">
+          <label>Best Time to Wear</label>
+          <input type="text" id="pTime" placeholder="e.g. Evening / Formal Gatherings" required>
+        </div>
+        <div class="form-group">
+          <label>Image Path / Filename</label>
+          <input type="text" id="pImage" value="images/dior-sauvage.png" placeholder="images/your-file.png">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="pDesc" rows="3" placeholder="Sensory description of the fragrance..." required></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Add to Catalog</button>
+      </form>
     </div>
-  </section>
 
-  <!-- Product Catalog Grid -->
-  <main class="catalog-container" id="catalog">
-    <div class="section-title">
-      <h2 id="currentHeading">Best Sellers & Signatures</h2>
-      <p id="matchCount">Showing all fragrances</p>
-    </div>
-    <div class="product-grid" id="productGrid">
-      <!-- Perfume cards inserted here dynamically -->
-    </div>
-  </main>
-
-  <!-- Detail & Checkout Modal (Tom Ford Reference) -->
-  <div class="modal-overlay" id="productModal">
-    <div class="modal-card">
-      <button class="close-btn" onclick="closeModal()">&times;</button>
-      <div class="modal-body" id="modalBody">
-        <!-- Rendered via JS -->
+    <!-- Live Customer Orders -->
+    <div class="card-panel">
+      <h2 style="margin-bottom: 1.2rem;">Live Customer Orders</h2>
+      <div id="ordersContainer">
+        <p style="font-size:0.85rem; color:var(--text-muted)">No customer orders placed yet.</p>
       </div>
     </div>
   </div>
 
-  <!-- Slide-out Cart Drawer -->
-  <div class="cart-drawer" id="cartDrawer">
-    <div class="cart-header">
-      <h3>Your Bag</h3>
-      <button class="close-btn" onclick="closeCart()">&times;</button>
-    </div>
-    <div class="cart-items" id="cartItems"></div>
-    <div class="cart-footer">
-      <div class="cart-total">
-        <span>Total:</span>
-        <span id="cartTotal">₱0.00</span>
-      </div>
-      <button class="btn-checkout" onclick="checkout()">Proceed to Checkout</button>
-    </div>
-  </div>
+  <script>
+    async function loadAdminData() {
+      // 1. Fetch Perfumes Count
+      try {
+        const pRes = await fetch('/api');
+        const perfumes = await pRes.json();
+        document.getElementById('totalCatalog').innerText = perfumes.length;
+      } catch (e) {}
 
-  <script src="app.js"></script>
+      // 2. Fetch Orders
+      try {
+        const oRes = await fetch('/api/orders');
+        const orders = await oRes.json();
+        renderOrders(orders);
+      } catch (e) {}
+    }
+
+    function renderOrders(orders) {
+      document.getElementById('totalOrders').innerText = orders.length;
+      const totalRev = orders.reduce((acc, curr) => acc + curr.total_amount, 0);
+      document.getElementById('totalRevenue').innerText = `₱${totalRev.toFixed(2)}`;
+
+      const container = document.getElementById('ordersContainer');
+      if (orders.length === 0) {
+        container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">No customer orders placed yet.</p>';
+        return;
+      }
+
+      container.innerHTML = orders.map(o => `
+        <div class="order-card">
+          <div class="order-header">
+            <strong>#${o.order_id} • ${o.customer_name}</strong>
+            <span class="order-status">${o.status}</span>
+          </div>
+          <div style="font-size:0.75rem; color:#777;">Phone: ${o.customer_phone} | Address: ${o.shipping_address}</div>
+          <div class="order-items">
+            ${o.items.map(i => `• ${i.name} (₱${i.price})`).join('<br>')}
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+            <span class="order-total">Total: ₱${o.total_amount.toFixed(2)}</span>
+            <small style="color:#999;">${o.timestamp}</small>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Handle Adding New Perfume
+    document.getElementById('addPerfumeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('pName').value,
+        gender: document.getElementById('pGender').value,
+        scent_family: document.getElementById('pFamily').value,
+        tag: document.getElementById('pTag').value,
+        price: parseFloat(document.getElementById('pPrice').value),
+        notes: document.getElementById('pNotes').value,
+        best_time: document.getElementById('pTime').value,
+        image: document.getElementById('pImage').value,
+        description: document.getElementById('pDesc').value
+      };
+
+      const res = await fetch('/api/perfumes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        alert('Perfume added successfully to the catalog!');
+        document.getElementById('addPerfumeForm').reset();
+        loadAdminData();
+      }
+    });
+
+    loadAdminData();
+  </script>
 </body>
 </html>

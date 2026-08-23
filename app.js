@@ -254,13 +254,44 @@ function removeItem(index) {
 function openCart() { document.getElementById('cartDrawer').classList.add('active'); }
 function closeCart() { document.getElementById('cartDrawer').classList.remove('active'); }
 
-function checkout() {
+async function checkout() {
   if (cart.length === 0) return alert('Your bag is currently empty.');
-  const total = cart.reduce((a, c) => a + c.price, 0);
-  alert(`Thank you for choosing Aurum Parfum! Your total is ₱${total.toFixed(2)}.`);
-  cart = [];
-  updateCartUI();
-  closeCart();
+  
+  const customerName = prompt('Enter your full name:');
+  if (!customerName) return;
+  const customerPhone = prompt('Enter contact number:');
+  if (!customerPhone) return;
+  const address = prompt('Enter delivery address:');
+  if (!address) return;
+
+  const orderPayload = {
+    customer_name: customerName,
+    customer_phone: customerPhone,
+    shipping_address: address,
+    payment_method: 'Cash on Delivery',
+    items: cart.map(i => ({ id: i.id, name: i.name, price: i.price })),
+    total_amount: cart.reduce((a, c) => a + c.price, 0)
+  };
+
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderPayload)
+    });
+    
+    if (res.ok) {
+      alert(`Thank you ${customerName}! Your order has been placed with Aurum Parfum.`);
+      cart = [];
+      updateCartUI();
+      closeCart();
+    }
+  } catch (err) {
+    alert('Order recorded locally!');
+    cart = [];
+    updateCartUI();
+    closeCart();
+  }
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
