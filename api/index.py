@@ -13,6 +13,14 @@ app = FastAPI()
 def read_root():
     return FileResponse("index.html")
 
+@app.get("/admin.html")
+def serve_admin():
+    return FileResponse("admin.html")
+
+@app.get("/admin")
+def serve_admin_alias():
+    return FileResponse("admin.html")    
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
