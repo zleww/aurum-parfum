@@ -1,4 +1,4 @@
-const CORE_PERFUMES = [
+const CORE_INITIAL_CATALOG = [
   {
     id: 1,
     name: "Dior Sauvage",
@@ -9,6 +9,7 @@ const CORE_PERFUMES = [
     best_time: "Night Out / Versatile Daily",
     description: "Radically fresh, raw, and magnetic with crisp citrus and intense ambery woods.",
     price: 250,
+    stock: 30,
     image: "images/dior-sauvage.png"
   },
   {
@@ -21,6 +22,7 @@ const CORE_PERFUMES = [
     best_time: "Party / Evening / Fall",
     description: "A luminous aura with an intense, vibrant, and glowing combination of fresh mint and sweet vanilla.",
     price: 250,
+    stock: 25,
     image: "images/versace-eros.png"
   },
   {
@@ -33,6 +35,7 @@ const CORE_PERFUMES = [
     best_time: "Casual Days / Warm Evenings",
     description: "An intense, refreshing contrast that blends aqueous watermelon with an unexpected dark chocolate finish.",
     price: 250,
+    stock: 20,
     image: "images/lacoste-black.png"
   },
   {
@@ -45,6 +48,7 @@ const CORE_PERFUMES = [
     best_time: "Office / Formal / Summer",
     description: "Understated refinement expressing classic masculine elegance with woody tea nuances.",
     price: 250,
+    stock: 15,
     image: "images/bvlgari-extreme.png"
   },
   {
@@ -57,6 +61,7 @@ const CORE_PERFUMES = [
     best_time: "Everyday Casual / Morning",
     description: "The universally clean, iconic citrus harmony designed for effortless daily wear.",
     price: 250,
+    stock: 40,
     image: "images/ck-one.png"
   },
   {
@@ -69,6 +74,7 @@ const CORE_PERFUMES = [
     best_time: "Signature Daily / Spring",
     description: "An ethereal sensation of soft white cotton, radiant clean florals, and subtle musks.",
     price: 250,
+    stock: 18,
     image: "images/valaya.png"
   },
   {
@@ -81,6 +87,7 @@ const CORE_PERFUMES = [
     best_time: "Cool Weather / Date Night",
     description: "An uplifting, dreamy scent imbued with decadent praline and airy whipped cream.",
     price: 250,
+    stock: 35,
     image: "images/cloud.png"
   },
   {
@@ -93,6 +100,7 @@ const CORE_PERFUMES = [
     best_time: "Daytime Professional / High Tea",
     description: "An unpredictable, sparkling floral constellation wrapped in soft spiced elegance.",
     price: 250,
+    stock: 22,
     image: "images/chanel-chance.png"
   },
   {
@@ -105,6 +113,7 @@ const CORE_PERFUMES = [
     best_time: "Summer / Outings / Casual",
     description: "A dazzling tropical fantasy rich with ripe passionfruit and cheerful sunny blooms.",
     price: 250,
+    stock: 12,
     image: "images/incanto-shine.png"
   },
   {
@@ -117,11 +126,12 @@ const CORE_PERFUMES = [
     best_time: "Afternoon / Casual Glam",
     description: "A vibrant blend of fresh-cut peonies and exotic sun-drenched fruits.",
     price: 250,
+    stock: 28,
     image: "images/bombshell.png"
   }
 ];
 
-let perfumes = [...CORE_PERFUMES];
+let perfumes = [];
 let cart = [];
 let activeFilters = {
   gender: 'all',
@@ -129,29 +139,23 @@ let activeFilters = {
   scent_family: 'all',
   search: ''
 };
+let selectedQty = 1;
 
-async function fetchCatalog() {
-  let customAdditions = JSON.parse(localStorage.getItem('aurum_custom_perfumes') || '[]');
-  
-  try {
-    const res = await fetch('/api');
-    if (res.ok) {
-      const serverData = await res.json();
-      if (Array.isArray(serverData) && serverData.length > 0) {
-        // Ensure core perfumes are always present
-        const serverIds = new Set(serverData.map(p => p.name.toLowerCase()));
-        const missingCore = CORE_PERFUMES.filter(cp => !serverIds.has(cp.name.toLowerCase()));
-        perfumes = [...missingCore, ...serverData];
-        renderCatalog();
-        return;
-      }
-    }
-  } catch (err) {
-    console.log('Using local client catalog');
+function getSharedCatalog() {
+  const stored = localStorage.getItem('aurum_master_catalog');
+  if (stored) {
+    return JSON.parse(stored);
   }
+  localStorage.setItem('aurum_master_catalog', JSON.stringify(CORE_INITIAL_CATALOG));
+  return CORE_INITIAL_CATALOG;
+}
 
-  // Merge default 10 + any new admin additions
-  perfumes = [...CORE_PERFUMES, ...customAdditions];
+function saveSharedCatalog(catalog) {
+  localStorage.setItem('aurum_master_catalog', JSON.stringify(catalog));
+}
+
+function syncStore() {
+  perfumes = getSharedCatalog();
   renderCatalog();
 }
 
@@ -177,17 +181,20 @@ function renderCatalog() {
   if (matchCount) matchCount.innerText = `Showing ${filtered.length} fragrances`;
 
   filtered.forEach(p => {
+    const isOutOfStock = (p.stock || 0) <= 0;
     const card = document.createElement('div');
     card.className = 'card';
     card.onclick = () => openProductModal(p.id);
     card.innerHTML = `
       <div class="card-img-wrapper">
         <span class="badge">${p.gender}</span>
+        ${isOutOfStock ? '<span class="out-stock-badge">Sold Out</span>' : ''}
         <img src="${p.image}" alt="${p.name}" onerror="this.src='images/dior-sauvage.png'">
       </div>
       <div class="card-info">
         <span class="card-tag">${p.scent_family} • ${p.tag}</span>
         <h3 class="card-name">${p.name}</h3>
+        <p class="card-stock" style="font-size:0.75rem; color:#888;">${isOutOfStock ? 'Out of Stock' : `${p.stock} bottles left`}</p>
         <p class="card-price">₱${p.price.toFixed(2)}</p>
       </div>
     `;
@@ -198,6 +205,9 @@ function renderCatalog() {
 function openProductModal(id) {
   const item = perfumes.find(p => p.id === id);
   if (!item) return;
+
+  selectedQty = 1;
+  const isOutOfStock = (item.stock || 0) <= 0;
 
   const modalBody = document.getElementById('modalBody');
   modalBody.innerHTML = `
@@ -210,12 +220,36 @@ function openProductModal(id) {
       <div class="detail-row"><strong>Scent Family:</strong> ${item.scent_family}</div>
       <div class="detail-row"><strong>Key Notes:</strong> ${item.notes}</div>
       <div class="detail-row"><strong>Best Time to Wear:</strong> ${item.best_time}</div>
+      <div class="detail-row"><strong>Availability:</strong> ${isOutOfStock ? '<span style="color:red;font-weight:600;">Out of Stock</span>' : `<span style="color:green;font-weight:600;">${item.stock} in stock</span>`}</div>
       <p style="margin: 1rem 0; font-size: 0.85rem; color: #555;">${item.description}</p>
       <div class="modal-price">₱${item.price.toFixed(2)}</div>
-      <button class="btn-add-cart" onclick="addToCart(${item.id})">Add to Bag</button>
+      
+      ${!isOutOfStock ? `
+        <div class="qty-selector">
+          <span style="font-size:0.8rem; text-transform:uppercase; font-weight:600;">Quantity:</span>
+          <div class="qty-controls">
+            <button type="button" class="btn-qty" onclick="changeModalQty(-1, ${item.stock})">-</button>
+            <span id="modalQtyDisplay" class="qty-display">1</span>
+            <button type="button" class="btn-qty" onclick="changeModalQty(1, ${item.stock})">+</button>
+          </div>
+        </div>
+        <button class="btn-add-cart" onclick="addToCart(${item.id})">Add to Bag</button>
+      ` : `
+        <button class="btn-add-cart" style="background:#999; cursor:not-allowed;" disabled>Currently Sold Out</button>
+      `}
     </div>
   `;
   document.getElementById('productModal').classList.add('active');
+}
+
+function changeModalQty(delta, maxStock) {
+  selectedQty += delta;
+  if (selectedQty < 1) selectedQty = 1;
+  if (selectedQty > maxStock) {
+    selectedQty = maxStock;
+    alert(`Only ${maxStock} bottles currently in stock.`);
+  }
+  document.getElementById('modalQtyDisplay').innerText = selectedQty;
 }
 
 function closeModal() {
@@ -224,30 +258,50 @@ function closeModal() {
 
 function addToCart(id) {
   const item = perfumes.find(p => p.id === id);
-  if (item) {
-    cart.push(item);
-    updateCartUI();
-    closeModal();
-    openCart();
+  if (!item) return;
+
+  const existing = cart.find(c => c.id === id);
+  const currentInCart = existing ? existing.quantity : 0;
+
+  if (currentInCart + selectedQty > item.stock) {
+    return alert(`Sorry, we only have ${item.stock} units available.`);
   }
+
+  if (existing) {
+    existing.quantity += selectedQty;
+  } else {
+    cart.push({ ...item, quantity: selectedQty });
+  }
+
+  updateCartUI();
+  closeModal();
+  openCart();
 }
 
 function updateCartUI() {
-  document.getElementById('cartCount').innerText = cart.length;
+  const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  document.getElementById('cartCount').innerText = totalCount;
+  
   const list = document.getElementById('cartItems');
   list.innerHTML = '';
   
   let sum = 0;
   cart.forEach((item, index) => {
-    sum += item.price;
+    const itemTotal = item.price * item.quantity;
+    sum += itemTotal;
     const el = document.createElement('div');
     el.className = 'cart-item';
     el.innerHTML = `
-      <div>
+      <div style="flex:1;">
         <strong>${item.name}</strong><br>
-        <small>₱${item.price.toFixed(2)}</small>
+        <small>₱${item.price.toFixed(2)} × ${item.quantity} = ₱${itemTotal.toFixed(2)}</small>
       </div>
-      <button onclick="removeItem(${index})" style="border:none;background:none;color:red;cursor:pointer;font-size:1.2rem;">&times;</button>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button onclick="modifyCartQty(${index}, -1)" class="btn-cart-qty">-</button>
+        <span style="font-size:0.85rem; font-weight:600;">${item.quantity}</span>
+        <button onclick="modifyCartQty(${index}, 1)" class="btn-cart-qty">+</button>
+        <button onclick="removeCartItem(${index})" style="border:none;background:none;color:red;cursor:pointer;font-size:1.1rem;margin-left:6px;">&times;</button>
+      </div>
     `;
     list.appendChild(el);
   });
@@ -255,7 +309,23 @@ function updateCartUI() {
   document.getElementById('cartTotal').innerText = `₱${sum.toFixed(2)}`;
 }
 
-function removeItem(index) {
+function modifyCartQty(index, delta) {
+  const item = cart[index];
+  const catalogItem = perfumes.find(p => p.id === item.id);
+  const maxStock = catalogItem ? catalogItem.stock : 999;
+
+  item.quantity += delta;
+  if (item.quantity > maxStock) {
+    item.quantity = maxStock;
+    alert(`Only ${maxStock} units left in stock.`);
+  }
+  if (item.quantity <= 0) {
+    cart.splice(index, 1);
+  }
+  updateCartUI();
+}
+
+function removeCartItem(index) {
   cart.splice(index, 1);
   updateCartUI();
 }
@@ -273,40 +343,41 @@ async function checkout() {
   const address = prompt('Enter delivery address:');
   if (!address) return;
 
+  const totalAmount = cart.reduce((a, c) => a + (c.price * c.quantity), 0);
   const orderPayload = {
-    customer_name: customerName,
-    customer_phone: customerPhone,
-    shipping_address: address,
-    payment_method: 'Cash on Delivery',
-    items: cart.map(i => ({ id: i.id, name: i.name, price: i.price })),
-    total_amount: cart.reduce((a, c) => a + c.price, 0)
-  };
-
-  try {
-    await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(orderPayload)
-    });
-  } catch (err) {}
-
-  // Save to orders storage
-  let localOrders = JSON.parse(localStorage.getItem('aurum_orders') || '[]');
-  localOrders.unshift({
     order_id: `AUR-${Date.now().toString().slice(-4)}`,
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     status: 'Pending',
-    ...orderPayload
-  });
-  localStorage.setItem('aurum_orders', JSON.stringify(localOrders));
+    customer_name: customerName,
+    customer_phone: customerPhone,
+    shipping_address: address,
+    items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+    total_amount: totalAmount
+  };
 
-  alert(`Thank you ${customerName}! Your order has been placed with Aurum Parfum.`);
+  // Deduct inventory stock
+  let catalog = getSharedCatalog();
+  cart.forEach(cartItem => {
+    const found = catalog.find(p => p.id === cartItem.id);
+    if (found) {
+      found.stock = Math.max(0, (found.stock || 0) - cartItem.quantity);
+    }
+  });
+  saveSharedCatalog(catalog);
+
+  // Store new order
+  let orders = JSON.parse(localStorage.getItem('aurum_orders') || '[]');
+  orders.unshift(orderPayload);
+  localStorage.setItem('aurum_orders', JSON.stringify(orders));
+
+  alert(`Thank you ${customerName}! Your order for ${cart.reduce((s, i) => s + i.quantity, 0)} bottles totaling ₱${totalAmount.toFixed(2)} has been placed.`);
   cart = [];
   updateCartUI();
   closeCart();
+  syncStore();
 }
 
-// Navigation & Category Filters
+// Filters
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -340,5 +411,6 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
   renderCatalog();
 });
 
-setInterval(fetchCatalog, 4000);
-window.addEventListener('DOMContentLoaded', fetchCatalog);
+// Real-time synchronization
+setInterval(syncStore, 2000);
+window.addEventListener('DOMContentLoaded', syncStore);
