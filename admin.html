@@ -147,100 +147,38 @@
     </div>
   </div>
 
-  <script>
-    async function loadAdminData() {
-      // 1. Fetch Perfumes
-      try {
-        const pRes = await fetch('/api');
-        if (pRes.ok) {
-          const perfumes = await pRes.json();
-          document.getElementById('totalCatalog').innerText = perfumes.length;
-        }
-      } catch (e) {}
+// Replace the form event listener in admin.html with this:
+document.getElementById('addPerfumeForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const payload = {
+    id: Date.now(),
+    name: document.getElementById('pName').value,
+    gender: document.getElementById('pGender').value,
+    scent_family: document.getElementById('pFamily').value,
+    tag: document.getElementById('pTag').value,
+    price: parseFloat(document.getElementById('pPrice').value),
+    notes: document.getElementById('pNotes').value,
+    best_time: document.getElementById('pTime').value,
+    image: document.getElementById('pImage').value || 'images/dior-sauvage.png',
+    description: document.getElementById('pDesc').value
+  };
 
-      // 2. Fetch Orders
-      let orders = [];
-      try {
-        const oRes = await fetch('/api/orders');
-        if (oRes.ok) {
-          orders = await oRes.json();
-        }
-      } catch (e) {
-        orders = JSON.parse(localStorage.getItem('aurum_orders') || '[]');
-      }
-      renderOrders(orders);
-    }
-
-    function renderOrders(orders) {
-      document.getElementById('totalOrders').innerText = orders.length;
-      const totalRev = orders.reduce((acc, curr) => acc + curr.total_amount, 0);
-      document.getElementById('totalRevenue').innerText = `₱${totalRev.toFixed(2)}`;
-
-      const container = document.getElementById('ordersContainer');
-      if (!orders || orders.length === 0) {
-        container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-muted)">No customer orders placed yet.</p>';
-        return;
-      }
-
-      container.innerHTML = orders.map(o => `
-        <div class="order-card">
-          <div class="order-header">
-            <strong>#${o.order_id} • ${o.customer_name}</strong>
-            <span class="order-status">${o.status}</span>
-          </div>
-          <div style="font-size:0.75rem; color:#666; margin-bottom: 4px;">
-            📞 ${o.customer_phone} | 📍 ${o.shipping_address}
-          </div>
-          <div class="order-items">
-            ${o.items.map(i => `• ${i.name} (₱${i.price.toFixed(2)})`).join('<br>')}
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
-            <span class="order-total">Total: ₱${o.total_amount.toFixed(2)}</span>
-            <small style="color:#999;">${o.timestamp}</small>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    // Add Fragrance Handler
-    document.getElementById('addPerfumeForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const payload = {
-        name: document.getElementById('pName').value,
-        gender: document.getElementById('pGender').value,
-        scent_family: document.getElementById('pFamily').value,
-        tag: document.getElementById('pTag').value,
-        price: parseFloat(document.getElementById('pPrice').value),
-        notes: document.getElementById('pNotes').value,
-        best_time: document.getElementById('pTime').value,
-        image: document.getElementById('pImage').value,
-        description: document.getElementById('pDesc').value
-      };
-
-      try {
-        const res = await fetch('/api/perfumes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          alert('Perfume added successfully! It is now live on the storefront.');
-        }
-      } catch (err) {
-        // Local backup update
-        let catalog = JSON.parse(localStorage.getItem('aurum_catalog') || '[]');
-        catalog.push({ id: Date.now(), ...payload });
-        localStorage.setItem('aurum_catalog', JSON.stringify(catalog));
-        alert('Perfume saved and synced to store!');
-      }
-
-      document.getElementById('addPerfumeForm').reset();
-      loadAdminData();
+  try {
+    await fetch('/api/perfumes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
+  } catch (err) {}
 
-    // Auto-refresh orders every 3 seconds
-    setInterval(loadAdminData, 3000);
-    window.addEventListener('DOMContentLoaded', loadAdminData);
-  </script>
+  // Append new addition without replacing the core 10
+  let custom = JSON.parse(localStorage.getItem('aurum_custom_perfumes') || '[]');
+  custom.push(payload);
+  localStorage.setItem('aurum_custom_perfumes', JSON.stringify(custom));
+
+  alert('Fragrance added! It is now live in the store.');
+  document.getElementById('addPerfumeForm').reset();
+  loadAdminData();
+});
 </body>
 </html>
