@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
@@ -7,6 +8,10 @@ import os
 import time
 
 app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return FileResponse("index.html")
 
 app.add_middleware(
     CORSMiddleware,
