@@ -1,5 +1,5 @@
 // Replace this with your new Vercel deployment URL once deployed
-const API_URL = "https://aurum-parfum.vercel.app";
+const API_URL = "https://aurum-parfum-psi.vercel.app";
 
 document.addEventListener("DOMContentLoaded", () => {
   loadAllPerfumes();
